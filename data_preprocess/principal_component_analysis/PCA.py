@@ -16,7 +16,7 @@ class PCA():
         return (sum([(y - sum(x)/len(x)) ** 2 for y in x])/(len(x) - 1)) ** 0.5
 
     def covariance(self, x, y):
-        return sum([(x_i - sum(x)/len(x))*(y_i - sum(y)/len(y)) for x_i, y_i in zip(x, y)])/len(x)
+        return sum([(x_i - sum(x)/len(x))*(y_i - sum(y)/len(y)) for x_i, y_i in zip(x, y)])/(len(x)-1)
 
     def covariance_matrix(self, data):
         """
@@ -52,6 +52,11 @@ class PCA():
     def normalise(self, data):
         return data/np.sum(data)
 
+    def plot_scree(self, data):
+        plt.bar(1 + np.array(range(len(data))), self.normalise(data))
+        plt.ylabel('Percentage of variation explained')
+        plt.xlabel('Eigenvalue')
+
 
     def fit(self, data, scree = False):
         standardised_data = []
@@ -66,7 +71,5 @@ class PCA():
         eigenvalues = eigenvalues[idx]
         feature_matrix = feature_matrix[:, idx]
         if scree:
-            plt.bar(1 + np.array(range(len(eigenvalues))), self.normalise(eigenvalues))
-            plt.ylabel('Percentage of variation explained')
-            plt.xlabel('Eigenvalue')
-        return np.matmul(feature_matrix, standardised_data)
+            self.plot_scree(eigenvalues)
+        return np.matmul(feature_matrix, data[:self.dimensions])
